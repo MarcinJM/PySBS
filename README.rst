@@ -38,7 +38,7 @@ Or, if you wish to edit the source code without re-installing each time ::
 
 Example of use
 --------------
-An of two mode calculations is provided in the examples directory. The documented examples include:
+The files are located in the examples directory. The documented examples include:
     - Caclulating electromagnetic and elastic modes for silicon waveguide
     - Calculating the elastic and electromagnetic modes of chalcogenide waveguides
     - TODO: document gain calculations currently in the gain directory
