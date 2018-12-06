@@ -56,7 +56,7 @@ PySBS is licensed under the `GPLv3 license <http://choosealicense.com/licenses/g
 
 References
 ----------
-If you use this package for research please cite the following paper: [add arxiv link]
+If you use this package for research please cite the following paper: [TODO arxiv link]
 
 
 
