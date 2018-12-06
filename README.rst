@@ -51,7 +51,7 @@ The files are located in the examples directory. The documented examples include
 
 License
 -------
-PySBS is licensed under the `GPLv3 license <http://choosealicense.com/licenses/gpl-3.0/>`_. This means that you are free to use PySBS for any **open-source** project. Of course, PySBS is provided "as is" with absolutely no warrenty.
+PySBS is licensed under the `GPLv3 license <http://choosealicense.com/licenses/gpl-3.0/>`_. This means that you are free to use PySBS for any **open-source** project. PySBS is provided "as is" with absolutely no warranty.
 
 
 References
