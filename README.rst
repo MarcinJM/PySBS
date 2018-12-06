@@ -30,11 +30,11 @@ PySBS installation
 
 You can download the latest version of PySBS from github and install it via ::
 
-    python setup.py install
+    python3 setup.py install
 
 Or, if you wish to edit the source code without re-installing each time ::
 
-    python setup.py develop
+    python3 setup.py develop
 
 
 
