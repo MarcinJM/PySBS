@@ -6,7 +6,7 @@ PySBS: Stimulated Brillouin scattering simulations in Python
 Introduction
 ------------
 
-PySBS provide a set of easy to use tools for simulations of Brillouin scattering in waveguides. The core of the program is an elastic mode which is fully tensorial and enables simulation of anisotropic materials. The solver is coupled with an electromagnetic mode solver to calculate the Brillouin gain.
+PySBS provide a set of easy to use tools for simulations of Brillouin scattering in waveguides. The core of the program is an elastic mode solver which is fully tensorial and enables simulation of anisotropic materials. The solver is coupled with an electromagnetic mode solver to calculate the Brillouin gain with the inclusion of all forces, bulk electrostriction, boundary electrostriction and radiation pressure on the dielectric interface.
 
 .. image:: figures/mode.png
 
