@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+*.py~
+
+# spder specific
+.spyproject
