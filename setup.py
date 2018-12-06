@@ -21,7 +21,8 @@ Tis file is part of PySBS.
 
 #!/usr/bin/env python
 
-from distutils.core import setup, find_packages
+from setuptools import setup, find_packages
+
 
 
 install_requires=[
@@ -39,7 +40,6 @@ setup(name='PySBS',
       install_requires=install_requires,
       #dependency_links=['add github url']
       #url=' add github url',
-      package_dir = {'': 'pysbs'},
       packages=find_packages(),
       
      )

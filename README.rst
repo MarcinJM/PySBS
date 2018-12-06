@@ -11,6 +11,8 @@ PySBS provide a set of easy to use tools for simulations of Brillouin scattering
 .. image:: figures/mode.png
 
 
+
+
 Installation
 ------------
 
@@ -38,6 +40,7 @@ Or, if you wish to edit the source code without re-installing each time ::
 
 Example of use
 --------------
+
 The files are located in the examples directory. The documented examples include:
     - Caclulating electromagnetic and elastic modes for silicon waveguide
     - Calculating the elastic and electromagnetic modes of chalcogenide waveguides

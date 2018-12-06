@@ -5,3 +5,11 @@ __pycache__/
 
 # spder specific
 .spyproject
+
+# library folders
+PySBS.egg-info/
+build/
+dist/
+pysbs/PySBS.egg-info/
+
+
