@@ -40,7 +40,7 @@ h_sim = 1.5
 w_wg = 0.45
 h_wg = 0.22
 lam = 1.55
-res = 100
+res = 50
 n_si = 3.48
 n_air = 1.0
 
@@ -64,6 +64,7 @@ materials.append(cladding)
 
 """ find the fundamental electromagnetic mode """
 
+# simulation is run twice to calculate group refractive index
 dlam = 0.001
 em_solver = EMSolver(wg.mesh, materials, lam+dlam)
 em_solver.n_modes = 2
@@ -74,10 +75,7 @@ em_solver.set_electric_walls()
 em_solver.setup_solver()
 em_solver.compute_eigenvalues()
 
-# make sure all values correspond to the first solution
 (E2, n_eff2) = em_solver.extract_normalized_field(0)
-
-
 em_solver = EMSolver(wg.mesh, materials, lam)
 em_solver.n_modes = 2
 em_solver.eigenmode_guess = core.em.e_r 
@@ -87,13 +85,12 @@ em_solver.set_electric_walls()
 em_solver.setup_solver()
 em_solver.compute_eigenvalues()
 (E, n_eff1) = em_solver.extract_normalized_field(0)
-
-
 # calculate ng
 ng = n_eff1 - lam*(n_eff2-n_eff1)/dlam
 print(ng)
-
+power_opt = em_solver.calculate_power(0, ng)
 plot_transverse_field(E)
+
 
 if direction == 'forward':
     """ find the fundamental elastic mode """
@@ -134,3 +131,42 @@ elif direction == 'backward':
 #    plot_displacement(submesh, u)
     plot_projection(submesh, u, 'Z')
     power_mech = el_solver.calculate_power(0)
+    
+    
+
+""" calculate forces and plot forces | calculate gain  """
+from pysbs.gain.plot import plot_bulk_electrostriction, plot_boundary_force
+from pysbs.misc.projection import project_Efield_on_submesh
+from pysbs.gain.internal_boundary import InternalBoundary
+from pysbs.gain.coupling import displacement_at_boundary, boundary_force_gain
+from pysbs.em.forces.electrostriction import (bulk_electrostriction, boundary_electrostriction)
+from pysbs.em.forces.stress import boundary_stress
+
+# elastic simulation is done on a subdomain hence we need to project onto submesh
+E_sub =project_Efield_on_submesh(em_solver, 0, submesh)
+plot_bulk_electrostriction(E_sub, direction, q_b, core_el_sim, submesh, power_opt)
+
+
+# build internal boundary with its normal
+boundary = InternalBoundary(wg.domains, 1,0)
+(ur_bdr, ui_bdr) = displacement_at_boundary(boundary, u)
+omega_mech = freq_mech*2.0*pi*1e9
+omega_opt = 2.0*pi*c0/(lam*1e-6)
+Q = 1000
+
+# boundary electrostriction
+(fr_bdr_elctst, fi_bdr_elctst) = boundary_electrostriction(E, cladding.em.p, core.em.p,
+                             cladding.em.e_r, core.em.e_r, direction, boundary, offset = 1e-12)
+gain_bdr_elcst =  boundary_force_gain(Q, power_opt, power_mech, omega_opt, fr_bdr_elctst, 
+                                      fi_bdr_elctst, ur_bdr, ui_bdr, boundary)
+print(gain_bdr_elcst)
+plot_boundary_force(fr_bdr_elctst, boundary, power_opt)
+# radiation pressure
+(fr_bdr_stress, fi_bdr_stress) = boundary_stress(E, cladding.em.e_r, core.em.e_r,
+                                        direction, boundary, offset = 1e-12)
+gain_bdr_stress =  boundary_force_gain(Q, power_opt, power_mech, omega_opt, fr_bdr_stress, 
+                                      fi_bdr_stress, ur_bdr, ui_bdr, boundary)
+print(gain_bdr_stress)
+plot_boundary_force(fr_bdr_stress, boundary, power_opt)
+
+

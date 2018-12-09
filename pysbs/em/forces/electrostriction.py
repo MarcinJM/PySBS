@@ -20,11 +20,9 @@ Tis file is part of PySBS.
 """
 from dolfin import as_vector, Dx, Constant, triangle, as_matrix
 from scipy.constants import epsilon_0
-from pysbs.em.forces.internal_boundary import InternalBoundary
+from pysbs.gain.internal_boundary import InternalBoundary
 import collections
 import numpy as np
-
-
 
 
 def sigma_boundary(E,p, e_r, direction):
@@ -139,61 +137,6 @@ def bulk_electrostriction(E, e_r,p, direction, q_b):
         return (f_r, f_i)
 
 
-
-def plot_bulk_electrostriction(E, direction, q_b, materials, mesh):
-    """ plots bulk electrostriction in 2D for the whole simulation space
-        the solution is first projected into Lagrange basis """
-        
-    from dolfin import (VectorElement, FunctionSpace, TrialFunction, Function,
-                        TestFunction, split, dot, inner, lhs, rhs, solve, plot)
-    import matplotlib.pyplot as plt
-    
-    # bulk electrostriction
-    V = VectorElement("Lagrange", mesh.ufl_cell(), 1, dim = 3)
-    VComplex = FunctionSpace( mesh, V*V)
-    u = TrialFunction(VComplex)
-    (ur, ui) = split(u)
-    v = TestFunction(VComplex)
-    (vr, vi) = split(v)
-    f_bulk = Function(VComplex)
-    
-    
-    for idx, material in enumerate(materials):
-        if idx == 0:
-            (fr_bulk, fi_bulk) = bulk_electrostriction(E, material.em.e_r, material.em.p, direction, q_b)       
-            F = dot(vr,fr_bulk)*material.domain + dot(vi,fi_bulk)*material.domain
-            F -= inner(vr,ur)*material.domain + inner(vi,ui)*material.domain
-        else:
-            (fr_bulk, fi_bulk) = bulk_electrostriction(E, material.em.e_r, material.em.p, direction, q_b)
-            F += dot(vr,fr_bulk)*material.domain + dot(vi,fi_bulk)*material.domain
-            F -= inner(vr,ur)*material.domain + inner(vi,ui)*material.domain
-            
-        
-    a = lhs(F)
-    L = rhs(F)    
-    solve(a==L, f_bulk)
-    
-    """
-    f_bulk_2D = as_vector((f_bulk[3], f_bulk[4]))
-    plot(f_bulk_2D)
-    """
-    w0 = f_bulk.compute_vertex_values(mesh)
-    
-    nv = mesh.num_vertices()
-    w0 = [w0[i * nv: (i + 1) * nv] for i in range(3)]
-    U = w0[0]
-    V = w0[1]
-    #W = w0[2]
-    XY = mesh.coordinates()
-    X = XY[:,0]
-    Y = XY[:,1]
-    #Z = np.zeros(nv)    
-    fig = plt.figure()
-    ax = fig.gca()
-    ax.quiver(X,Y, U,V)
-    plt.show()
-    
-    return f_bulk
 
 
 if __name__ == "__main__":

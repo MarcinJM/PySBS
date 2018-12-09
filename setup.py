@@ -39,7 +39,7 @@ setup(name='PySBS',
       author_email='marcinjmalinowski@gmail.com',
       install_requires=install_requires,
       #dependency_links=['add github url']
-      #url=' add github url',
+      url='https://github.com/MarcinJM/PySBS',
       packages=find_packages(),
-      
+      license = 'GPL'
      )

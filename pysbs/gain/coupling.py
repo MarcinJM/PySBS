@@ -1,17 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct 19 16:31:44 2018
-coupling calculation 
-need the E field and the U field from both solvers
-# run soi in air first
-@author: marcin
 
+Tis file is part of PySBS.
+    PySBS is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    PySBS is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    
+    If you use it in research please cite an appropriate paper from README file.
+    
+    If you have any questions email: marcinjmalinowski@gmail.com
+    
+    author: Marcin Malinowski
 """
 
 import numpy as np
 from scipy.constants import c as c0
-from dolfin import assemble, dot
 from math import pi
 from dolfin import (FunctionSpace, project, VectorElement, as_vector, dx,
                     interpolate, Function, triangle, Constant, dot, assemble)
@@ -36,19 +46,6 @@ def boundary_force_coupling(fr, fi, ur, ui, boundary):
     return coupling
 
 
-def project_Efield_on_submesh(em_solver, eigenvalue_index, submesh):
-    """ project E field onto a submesh 
-        multiplies Ez from solver to gamma Ez (true field) 
-        assume Ez is imaginary as in the em solver"""
-    r, c, rx, cx = em_solver.esolver.get_eigenpair(eigenvalue_index)
-    e_raw = Function(em_solver._combined_space, rx)
-    Esubspace = FunctionSpace(submesh, em_solver._finite_element)
-    E_raw_sub = interpolate(e_raw, Esubspace)
-    gamma = (abs(r))**0.5
-    E_sub = as_vector([E_raw_sub[0], E_raw_sub[1], gamma*E_raw_sub[2]])
-    E_sub = project(E_sub)
-    return E_sub
-
 def bulk_force_coupling(fr_bulk, fi_bulk, u):
     """ caclulate |f*u*|^2 for bulk electrostriction"""
     (ur, ui) = u.split()
@@ -57,5 +54,27 @@ def bulk_force_coupling(fr_bulk, fi_bulk, u):
     int_coup_r = assemble(coup_r)
     int_coup_i = assemble(coup_i)
     #coupling_bulk = int_coup_r**2 + int_coup_i**2
-    coupling_bulk = int_coup_r + 1j*int_coup_i
-    return coupling_bulk
+    coupling = int_coup_r + 1j*int_coup_i
+    return coupling
+
+
+def bulk_force_gain(Q, power_opt, power_mech, omega_opt, fr_bulk, fi_bulk, u):
+    """ calculate gain due to bulk electrostriction 
+        returns gain in units of  W-1 m-1 """
+    coupling_bulk = bulk_force_coupling(fr_bulk, fi_bulk, u)
+    gain_bulk = Q*omega_opt/(4.0*power_opt**2*power_mech)*10**21*np.absolute(coupling_bulk)**2
+    return gain_bulk
+
+
+def boundary_force_gain(Q, power_opt, power_mech, omega_opt, fr_bdr, fi_bdr, ur_bdr, ui_bdr, boundary):
+    """ calculate gain due to boundary forces
+         returns gain in units of   W-1 m-1 """
+    gain_bdr =  (Q*omega_opt/(4.0*power_opt**2*power_mech)*10**21*
+            np.absolute(boundary_force_coupling(fr_bdr, fi_bdr, ur_bdr, ui_bdr, boundary))**2)
+    return gain_bdr
+
+
+
+
+
+
