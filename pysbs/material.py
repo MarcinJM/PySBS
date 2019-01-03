@@ -87,6 +87,7 @@ class Material():
         self.em = ElectromagneticProperties(1.0, 1.0, CubicPhotoelasticity(1.0, 1.0, 1.0))
         self.el = ElasticProperties(1.0, IsotropicStiffness(3.0, 1.0))
         self.domain = domain
+        
 
 
 

@@ -135,38 +135,15 @@ elif direction == 'backward':
     
 
 """ calculate forces and plot forces | calculate gain  """
-from pysbs.gain.plot import plot_bulk_electrostriction, plot_boundary_force
 from pysbs.misc.projection import project_Efield_on_submesh
 from pysbs.gain.internal_boundary import InternalBoundary
-from pysbs.gain.coupling import displacement_at_boundary, boundary_force_gain
-from pysbs.em.forces.electrostriction import (bulk_electrostriction, boundary_electrostriction)
-from pysbs.em.forces.stress import boundary_stress
-
+from pysbs.gain.coupling import Forces
 # elastic simulation is done on a subdomain hence we need to project onto submesh
-E_sub =project_Efield_on_submesh(em_solver, 0, submesh)
-plot_bulk_electrostriction(E_sub, direction, q_b, core_el_sim, submesh, power_opt)
+E_sub = project_Efield_on_submesh(em_solver, 0, submesh)
 
-
-# build internal boundary with its normal
-boundary = InternalBoundary(wg.domains, 1,0)
-(ur_bdr, ui_bdr) = displacement_at_boundary(boundary, u)
-omega_mech = freq_mech*2.0*pi*1e9
-omega_opt = 2.0*pi*c0/(lam*1e-6)
 Q = 1000
-
-# boundary electrostriction
-(fr_bdr_elctst, fi_bdr_elctst) = boundary_electrostriction(E, cladding.em.p, core.em.p,
-                             cladding.em.e_r, core.em.e_r, direction, boundary, offset = 1e-12)
-gain_bdr_elcst =  boundary_force_gain(Q, power_opt, power_mech, omega_opt, fr_bdr_elctst, 
-                                      fi_bdr_elctst, ur_bdr, ui_bdr, boundary)
-print(gain_bdr_elcst)
-plot_boundary_force(fr_bdr_elctst, boundary, power_opt)
-# radiation pressure
-(fr_bdr_stress, fi_bdr_stress) = boundary_stress(E, cladding.em.e_r, core.em.e_r,
-                                        direction, boundary, offset = 1e-12)
-gain_bdr_stress =  boundary_force_gain(Q, power_opt, power_mech, omega_opt, fr_bdr_stress, 
-                                      fi_bdr_stress, ur_bdr, ui_bdr, boundary)
-print(gain_bdr_stress)
-plot_boundary_force(fr_bdr_stress, boundary, power_opt)
-
+# build internal boundary with its normal
+boundary = InternalBoundary(wg.domains, 1, 0)
+forces =  Forces(E_sub, u, q_b, Q, power_opt, power_mech, 
+                 direction, freq_mech, lam, boundary)
 

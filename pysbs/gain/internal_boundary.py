@@ -12,7 +12,7 @@ import numpy as np
 
 
 def facet_length(facet):
-    """ calculate facetr length from FEniCs facet """
+    """ calculate FEniCS facet length """
     v_idx = facet.entities(0)
     v0 = Vertex(facet.mesh(), v_idx[0])
     v1 = Vertex(facet.mesh(), v_idx[1])
