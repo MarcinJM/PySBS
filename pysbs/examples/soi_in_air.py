@@ -56,7 +56,7 @@ core.el.C = CubicStiffness(165.7, 63.9,  79.6) #100 direction GPa
 core.em.p = CubicPhotoelasticity(-0.09, 0.017, -0.051) #100 direction
 core.el.rho = 2.328
 materials.append(core)
-# thermal oxide
+# air
 cladding = Material(wg.dx(0))
 cladding.em.er = n_air**2
 cladding.em.p =  CubicPhotoelasticity(0.0, 0.0, 0.0) # set to zero for air
@@ -97,9 +97,8 @@ if direction == 'forward':
     q_b = 0.0
     # need to extract submesh for silicon layer only
     submesh = SubMesh(wg.mesh, wg.domains, 1)
-    core_el_sim = core
-    core_el_sim.domain = dx
-    el_solver = ELSolver(submesh, core_el_sim)
+    core.domain = dx # change domain to whole submesh
+    el_solver = ELSolver(submesh, core)
     el_solver.n_modes = 6
     el_solver.q_b = q_b
     el_solver.plot_eigenmodes = False
@@ -116,8 +115,8 @@ elif direction == 'backward':
     """ find the fundamental elastic mode """
     q_b = 2.0*2.0*pi/lam*n_eff1
     # need to extract submesh for silicon layer only
-    submesh = SubMesh(wg.mesh, wg.domains, 1)
-    core_el_sim = core
+    core.domain = dx # change domain to whole submesh
+    el_solver = ELSolver(submesh, core)
     core_el_sim.domain = dx
     el_solver = ELSolver(submesh, core_el_sim)
     el_solver.n_modes = 10
@@ -137,13 +136,19 @@ elif direction == 'backward':
 """ calculate forces and plot forces | calculate gain  """
 from pysbs.misc.projection import project_Efield_on_submesh
 from pysbs.gain.internal_boundary import InternalBoundary
-from pysbs.gain.coupling import Forces
+from pysbs.gain.forces import Forces
 # elastic simulation is done on a subdomain hence we need to project onto submesh
 E_sub = project_Efield_on_submesh(em_solver, 0, submesh)
 
 Q = 1000
 # build internal boundary with its normal
+core.domain = wg.dx(1) # change to original
 boundary = InternalBoundary(wg.domains, 1, 0)
-forces =  Forces(E_sub, u, q_b, Q, power_opt, power_mech, 
-                 direction, freq_mech, lam, boundary)
-
+forces =  Forces(E, u, q_b, Q, power_opt, power_mech, 
+                 direction, freq_mech, lam, boundary, materials,  exclude_exterior = True)
+forces.calculate_boundary_electrostriction()
+forces.calculate_boundary_electrostriction_gain()
+forces.calculate_boundary_stress()
+forces.calculate_boundary_stress_gain()
+forces.calculate_bulk_electrostriction()
+forces.calculate_bulk_gain()

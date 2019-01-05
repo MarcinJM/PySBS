@@ -28,7 +28,7 @@ import matplotlib.tri as tri
 from matplotlib import ticker, cm
 from mpl_toolkits.mplot3d import Axes3D
 import collections
-from pysbs.em.forces.electrostriction import bulk_electrostriction
+from pysbs.gain.electrostriction import bulk_electrostriction
 
 
 def mesh2triang(mesh):
