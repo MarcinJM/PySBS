@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 
 Tis file is part of PySBS.
@@ -20,47 +18,59 @@ Tis file is part of PySBS.
     author: Marcin Malinowski
 """
 
+
 from pysbs.em.em_mode_solver import EMSolver
 from pysbs.el.el_mode_solver import ELSolver
 from pysbs.el.plot import plot_displacement, plot_projection
 from pysbs.em.plot import plot_transverse_field
 from pysbs.geometry import EmbeddedWaveguide
-from pysbs.material import Material, CubicStiffness,  CubicPhotoelasticity
 from dolfin import Function, SubMesh, dx
 import matplotlib.pyplot as plt
 from math import pi
+from pysbs.material import IsotropicStiffness, Material, IsotropicPhotoelasticity
 
 
-plt.close('all')
-""" find the fundamental optical mode """
+"""
+Note that there are plenty of modes, so if you have trouble locating the 
+funamental it might be better to run the scalar solver first to find the 
+good guess for the eigenvalue solver
 
-# lengths in um
-w_sim = 1.5
-h_sim = 1.5
-w_wg = 0.45
-h_wg = 0.315
-lam = 1.55
-res = 100
-n_si = 3.48
-n_air = 1.0
+"""
+w_sim = 2.0
+h_sim = 2.0
+w_wg = 1.0
+h_wg = 0.5
+res = 40
+lam = 1.544
+q_b = 2.0*2.0*pi*2.24/lam
+n_chg = 2.37
+n_ox = 1.44
+direction = 'backward'
 
-direction = 'forward'
 
+# waveguide
 wg = EmbeddedWaveguide(w_sim, h_sim, w_wg, h_wg, res)
 
-# silicon
+# plot domains to see how to assign materials
+# wg.plot_domains()
 materials = []
 core = Material(wg.dx(1))
-core.em.e_r = n_si**2
-core.el.C = CubicStiffness(165.7, 63.9,  79.6) #100 direction GPa
-core.em.p = CubicPhotoelasticity(-0.09, 0.017, -0.051) #100 direction
-core.el.rho = 2.328
+# As2S3
+core.el.C = IsotropicStiffness(22.19, 6.20) # in GPa
+core.em.p = IsotropicPhotoelasticity(0.25, 0.24)
+core.em.e_r = n_chg**2
+core.el.rho = 3.2 # g/cm3
 materials.append(core)
-# air
+# thermal oxide
 cladding = Material(wg.dx(0))
-cladding.em.er = n_air**2
-cladding.em.p =  CubicPhotoelasticity(0.0, 0.0, 0.0) # set to zero for air
+cladding.el.C = IsotropicStiffness(78.0, 31.6) # in GPa
+cladding.em.p = IsotropicPhotoelasticity(0.12, 0.27)
+cladding.em.e_r = n_ox**2
+cladding.rho = 2.2 # g/cm3
 materials.append(cladding)
+
+
+
 
 """ find the fundamental electromagnetic mode """
 
@@ -94,37 +104,29 @@ plot_transverse_field(E)
 
 
 """ find the fundamental elastic mode """
-q_b = 0.0
-# need to extract submesh for silicon layer only
-submesh = SubMesh(wg.mesh, wg.domains, 1)
-core.domain = dx # change domain to whole submesh
-el_solver = ELSolver(submesh, core)
+
+el_solver = ELSolver(wg.mesh, materials)
 el_solver.n_modes = 10
 el_solver.q_b = q_b
 el_solver.plot_eigenmodes = False
 el_solver.assemble_matrices()
-el_solver.eigenmode_guess =  8.5
+el_solver.eigenmode_guess = 7.79
 el_solver.setup_solver()
 el_solver.compute_eigenvalues()
 (u, freq_mech) = el_solver.extract_field(0)
-plot_displacement(submesh, u)
 power_mech = el_solver.calculate_power(0)
-
-
+plot_projection(wg.mesh, u, 'Z')
 
 
 """ calculate forces and plot forces | calculate gain  """
 
 from pysbs.gain.internal_boundary import InternalBoundary
 from pysbs.gain.forces import Forces
-from pysbs.misc.projection import project_Efield_on_submesh
-# elastic simulation is done on a subdomain hence we need to project onto submesh
-Esub = project_Efield_on_submesh(em_solver, 0, submesh)
-core.domain = wg.dx(1) # change to original
+
 Q = 1000
 # build internal boundary with its normal
 boundary = InternalBoundary(wg.domains, 1, 0)
-forces =  Forces(E, u, q_b, Q, power_opt, power_mech, direction, freq_mech, lam, boundary, materials, Esub)
+forces =  Forces(E, u, q_b, Q, power_opt, power_mech, direction, freq_mech, lam, boundary, materials)
 forces.calculate_boundary_electrostriction()
 gain_bdr_electrostriction = forces.calculate_boundary_electrostriction_gain()
 forces.calculate_boundary_stress()
@@ -132,15 +134,23 @@ gain_stress = forces.calculate_boundary_stress_gain()
 forces.calculate_bulk_electrostriction()
 gain_bulk = forces.calculate_bulk_electrostriction_gain()
 gain_total = forces.calculate_total_gain()
-forces.plot_boundary_forces()
-# plot xy electrostriction component
-from pysbs.gain.plot import plot_bulk_electrostriction
-core.domain = dx
-plot_bulk_electrostriction(Esub, direction, q_b, core, submesh, power_opt)
 
 print("Radiation pressure gain is %d W-1m-1" % (gain_stress))
 print("Bulk electrostriction gain is %d W-1m-1" % (gain_bulk))
 print("Total gain is %d W-1m-1" % (gain_total))
+
+
+""" analytical formula for fibers """
+from scipy.constants import c as c0
+p12 = 0.24
+Aeff = w_wg*1e-6*h_wg*1e-6
+df = freq_mech*1e9/Q
+rho = 3200
+overlap = 0.95
+gain_estimate = overlap*4*pi*n_chg**8*p12**2/(rho*c0*lam**3*1e-18*df*freq_mech*1e9*Aeff)
+print("Bulk electrostriction gain estimate is %d W-1m-1" % (gain_estimate))
+
+#
 
 
 

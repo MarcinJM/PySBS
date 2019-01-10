@@ -128,7 +128,6 @@ class ELSolver(ModeSolver):
         else:
             p = 0.0
             for material in self.materials:
-                material = self.materials
                 rho = material.el.rho
                 DX  = material.domain
                 norm = assemble(dot(u, rho*u)*DX)

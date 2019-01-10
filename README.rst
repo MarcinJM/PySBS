@@ -43,9 +43,18 @@ Examples of use
 
 The files are located in the examples directory.The documented examples include:
 
-    - Caclulating electromagnetic and elastic modes for silicon waveguide
+    - Caclulating electromagnetic and elastic modes for silicon waveguide 
     - Calculating the elastic and electromagnetic modes of chalcogenide waveguides
-    - TODO: document gain calculations currently in the gain directory
+    - Calculation of forces and Brillouin gain for silicon and chalcogenide waveguides
+
+Future
+---------------
+
+Under development:
+
+    - Automatic handling of degenerate modes i.e. square waveguide
+    - Calculation of boundary forces for multilayer structures, currently only
+      one boundary is handled withing the Forces class
 
 
 

@@ -18,13 +18,13 @@ Tis file is part of PySBS.
     author: Marcin Malinowski
 """
 
-
-from pysbs.el.el_mode_solver import ELSolver
-from pysbs.el.plot import plot_displacement
-from math import pi
-from pysbs.geometry import EmbeddedWaveguide
-from pysbs.material import IsotropicStiffness, Material
-from mshr import *
+#
+#from pysbs.el.el_mode_solver import ELSolver
+#from pysbs.el.plot import plot_displacement, plot_projection
+#from math import pi
+#from pysbs.geometry import EmbeddedWaveguide
+#from pysbs.material import IsotropicStiffness, Material
+#
 
 """
 Note that there are plenty of modes, so if you have trouble locating the 
@@ -35,8 +35,8 @@ good guess for the eigenvalue solver
 w_sim = 2.0
 h_sim = 2.0
 w_wg = 1.0
-h_wg = 1.0    
-res = 40
+h_wg = 0.5
+res = 100
 q_b = 2.0*2.0*pi*2.24/1.544
 
 
@@ -62,7 +62,7 @@ mode_solver.n_modes = 10
 mode_solver.plot_eigenmodes = False
 mode_solver.assemble_matrices()
 mode_solver.set_clamped_walls()
-mode_solver.eigenmode_guess = 7.7
+mode_solver.eigenmode_guess = 7.8
 mode_solver.setup_solver()
 mode_solver.compute_eigenvalues()
 (u, freq_mech) = mode_solver.extract_field(0)

@@ -26,6 +26,7 @@ import matplotlib.tri as tri
 import matplotlib.pyplot as plt
 from math import pi
 import numpy as np
+from pysbs.geometry import EmbeddedWaveguide
 
 
 # physical parameters
@@ -42,7 +43,7 @@ q_b_sqrd = Constant(q_b*q_b)
 w_sim = 2.0
 h_sim = 2.0
 w_wg = 1.0
-h_wg = 1.0
+h_wg = 0.5
 
 
 
@@ -101,7 +102,7 @@ eigensolver.solve(n_modes)
 for i in range(0,n_modes):
     r, c, rx, cx = eigensolver.get_eigenpair(i)
     if r > 0.0:
-        f_b = (r)**0.5/(2*pi)*1e-9
+        f_b = (r)**0.5/(2*pi)
         print("Frequency ", f_b, "GHz")
     else:
         print("Negative Frequency")

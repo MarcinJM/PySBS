@@ -130,18 +130,19 @@ def plot_bulk_electrostriction(E, direction, q_b, materials, mesh, power_opt):
     
     return fig
 
-def plot_boundary_force(fr_bdr, boundary, power_opt):
+def plot_boundary_force(fr_bdr, boundary, power_opt, title):
     quiver_scale = 100
     scaling = 1.0/(power_opt*1e3)*1e12 ##pN/(um^2mW)
     fr_bdr = fr_bdr*scaling
     fig = plt.figure()
     Q1 = plt.quiver(boundary.midpoints[:,0],boundary.midpoints[:,1],
                fr_bdr[:,0],fr_bdr[:,1], scale=quiver_scale, scale_units='inches')
-    plt.quiverkey(Q1, 0.5, 0.85, 50.0, r' $50 \frac{pN}{\mu m^2 mW}$', labelpos='E',
+    plt.quiverkey(Q1, 0.5, 0.5, 50.0, r' $50 \frac{pN}{\mu m^2 mW}$', labelpos='E',
                        coordinates='figure', fontproperties={'size': 24})
     plt.axis('equal')
     plt.xlabel('x [$\mu$m]', fontsize=24)
     plt.ylabel('y [$\mu$m]', fontsize=24)
+    plt.title(title, fontsize=24)
     ax = plt.gca()
     plt.tick_params(labelsize=24)    
     plt.show()
