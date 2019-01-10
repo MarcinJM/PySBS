@@ -123,7 +123,8 @@ plot_projection(wg.mesh, u, 'Z')
 from pysbs.gain.internal_boundary import InternalBoundary
 from pysbs.gain.forces import Forces
 
-Q = 1000
+# Q from  "On-chip stimulated Brillouin scattering"
+Q = 7700.0/34
 # build internal boundary with its normal
 boundary = InternalBoundary(wg.domains, 1, 0)
 forces =  Forces(E, u, q_b, Q, power_opt, power_mech, direction, freq_mech, lam, boundary, materials)
