@@ -63,7 +63,7 @@ def plot_projection(mesh, u, component):
    
 
 
-def plot_displacement(mesh, u):
+def plot_displacement(mesh, u, scale = 0.1):
     # extract displacement values
     w0 = u.compute_vertex_values(mesh)
     n = mesh.num_vertices()
@@ -83,10 +83,10 @@ def plot_displacement(mesh, u):
     # convert displacement to true xy position  
     mm = max( max(wx), max(wy))
     xy = mesh.coordinates() 
-    scale = max(max(xy[:,0]), max(xy[:,1]))
+    #scale = max(max(xy[:,0]), max(xy[:,1]))
     for ii in range(0,n):
-        wx[ii] = scale/mm*wx[ii]*0.1
-        wy[ii] = scale/mm*wy[ii]*0.1
+        wx[ii] = scale/mm*wx[ii]
+        wy[ii] = scale/mm*wy[ii]
         wx[ii] = wx[ii] + xy[ii,0]
         wy[ii] = wy[ii] + xy[ii,1]
 

@@ -18,8 +18,55 @@ Tis file is part of PySBS.
     author: Marcin Malinowski
 """
 from dolfin import SubDomain, between, plot, MeshFunction, Point, Measure 
-from mshr import Rectangle, generate_mesh
+from mshr import Rectangle, generate_mesh, Polygon
 import matplotlib.pyplot as plt
+from dolfin import Point
+
+
+def coupled_ridge_waveguides(w_wg1,w_wg2,w_gap,w_wing1, w_wing2,h_total,h_mem):
+    # manually define all points
+    domain_vertices = []
+    x = 0.0
+    y= 0.0
+    domain_vertices.append(Point(x,y))
+    x = 0.0
+    y= h_mem
+    domain_vertices.append(Point(x,y))
+    x += w_wing1
+    y= h_mem
+    domain_vertices.append(Point(x,y))
+    x = x
+    y= h_total
+    domain_vertices.append(Point(x,y))
+    x += w_wg1
+    y= h_total
+    domain_vertices.append(Point(x,y))
+    x = x
+    y= h_mem
+    domain_vertices.append(Point(x,y))
+    x += w_gap
+    y= h_mem
+    domain_vertices.append(Point(x,y))
+    x = x
+    y= h_total
+    domain_vertices.append(Point(x,y))
+    x += w_wg2
+    y = h_total
+    domain_vertices.append(Point(x,y))
+    x = x
+    y = h_mem
+    domain_vertices.append(Point(x,y))
+    x += w_wing2
+    y = h_mem
+    domain_vertices.append(Point(x,y))
+    x = x
+    y = 0.0
+    domain_vertices.append(Point(x,y))
+    domain_vertices.reverse() # need counter clockwise order
+    
+    
+    domain = Polygon(domain_vertices)
+    return domain
 
 class Waveguide(SubDomain):
     """ returns True if point is inside the waveguide """
