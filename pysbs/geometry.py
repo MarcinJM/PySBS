@@ -68,15 +68,36 @@ def coupled_ridge_waveguides(w_wg1,w_wg2,w_gap,w_wing1, w_wing2,h_total,h_mem):
     domain = Polygon(domain_vertices)
     return domain
 
-class Waveguide(SubDomain):
-    """ returns True if point is inside the waveguide """
-    def __init__(self, w_wg, h_wg):
-        super(Waveguide, self).__init__()
-        self.w_wg = w_wg
-        self.h_wg = h_wg
-    def inside(self, x, on_boundary):
-        return (between(x[0], (-self.w_wg/2, self.w_wg/2)) and
-                    between(x[1], (-self.h_wg/2, self.h_wg/2 )))
+        
+        
+class RidgeWaveguide():
+    """ a ridge waveguide with cladding class 
+        builds the mesh and marks domains """
+    
+    def __init__(self, w_membrane, w_ridge, h_ridge, h_memebrane, w_sim, h_sim, res):
+        self.res = res
+        domain_vertices = [Point(w_membrane/2, 0.0),
+                           Point(w_membrane/2, h_membrane),
+                           Point(w_ridge/2.0, h_membrane),
+                           Point(w_ridge/2.0 , h_membrane + h_ridge),
+                           Point(-w_ridge/2.0, h_membrane + h_ridge),
+                           Point(-w_ridge/2.0, h_membrane),
+                           Point(-w_membrane/2.0, h_membrane),
+                           Point(-w_membrane/2.0, 0.0)]
+        waveguide = Polygon(domain_vertices)
+        domain = Rectangle(Point(-w_sim/2,-h_sim/2),
+                           Point(w_sim/2,h_sim/2))
+        domain.set_subdomain(1, Rectangle(Point(-w_sim/2,-h_sim/2),
+                                          Point(w_sim/2,h_sim/2)))
+        domain.set_subdomain(2, waveguide)
+        self.mesh = generate_mesh(domain, res)
+        self.mesh.init()
+        self.domains = MeshFunction('size_t', self.mesh, 2, self.mesh.domains())
+        self.dx = Measure("dx")(subdomain_data=self.domains)
+        
+        
+
+
 
 class EmbeddedWaveguide():
     """ a rectangular waveguide with cladding class 
@@ -93,10 +114,5 @@ class EmbeddedWaveguide():
                                   Point(w_wg/2,h_wg/2)))
         self.mesh = generate_mesh(domain, self.res)
         self.mesh.init()
-        # Initialize mesh function for interior domains
-        self.waveguide = Waveguide(w_wg, h_wg)
-        self.domains = MeshFunction("size_t", self.mesh, 2)
-        self.domains.set_all(0)
-        self.waveguide.mark(self.domains, 1)
-        # Define new measures associated with the interior domains 
+        self.domains = MeshFunction('size_t', self.mesh, 2, self.mesh.domains())
         self.dx = Measure("dx")(subdomain_data=self.domains)

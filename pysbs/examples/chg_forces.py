@@ -36,13 +36,13 @@ funamental it might be better to run the scalar solver first to find the
 good guess for the eigenvalue solver
 
 """
-w_sim = 2.0
+w_sim = 6.0
 h_sim = 2.0
-w_wg = 1.0
-h_wg = 0.5
-res = 40
+w_wg = 4.0
+h_wg = 0.85
+res = 50
 lam = 1.544
-q_b = 2.0*2.0*pi*2.24/lam
+
 n_chg = 2.37
 n_ox = 1.44
 direction = 'backward'
@@ -54,7 +54,7 @@ wg = EmbeddedWaveguide(w_sim, h_sim, w_wg, h_wg, res)
 # plot domains to see how to assign materials
 # wg.plot_domains()
 materials = []
-core = Material(wg.dx(1))
+core = Material(wg.dx(2))
 # As2S3
 core.el.C = IsotropicStiffness(22.19, 6.20) # in GPa
 core.em.p = IsotropicPhotoelasticity(0.25, 0.24)
@@ -62,7 +62,7 @@ core.em.e_r = n_chg**2
 core.el.rho = 3.2 # g/cm3
 materials.append(core)
 # thermal oxide
-cladding = Material(wg.dx(0))
+cladding = Material(wg.dx(1))
 cladding.el.C = IsotropicStiffness(78.0, 31.6) # in GPa
 cladding.em.p = IsotropicPhotoelasticity(0.12, 0.27)
 cladding.em.e_r = n_ox**2
@@ -105,12 +105,13 @@ plot_transverse_field(E)
 
 """ find the fundamental elastic mode """
 
+q_b = 2.0*2.0*pi*n_eff1/lam
 el_solver = ELSolver(wg.mesh, materials)
 el_solver.n_modes = 10
 el_solver.q_b = q_b
 el_solver.plot_eigenmodes = False
 el_solver.assemble_matrices()
-el_solver.eigenmode_guess = 7.79
+el_solver.eigenmode_guess = 7.736
 el_solver.setup_solver()
 el_solver.compute_eigenvalues()
 (u, freq_mech) = el_solver.extract_field(0)
@@ -126,7 +127,7 @@ from pysbs.gain.forces import Forces
 # Q from  "On-chip stimulated Brillouin scattering"
 Q = 7700.0/34
 # build internal boundary with its normal
-boundary = InternalBoundary(wg.domains, 1, 0)
+boundary = InternalBoundary(wg.domains, 1, 2)
 forces =  Forces(E, u, q_b, Q, power_opt, power_mech, direction, freq_mech, lam, boundary, materials)
 forces.calculate_boundary_electrostriction()
 gain_bdr_electrostriction = forces.calculate_boundary_electrostriction_gain()
@@ -142,9 +143,10 @@ print("Total gain is %d W-1m-1" % (gain_total))
 
 
 """ analytical formula for fibers """
+""" Pant, Ravi, et al. "On-chip stimulated Brillouin scattering." Optics express 19.9 (2011): 8285-8290. """
 from scipy.constants import c as c0
 p12 = 0.24
-Aeff = w_wg*1e-6*h_wg*1e-6
+Aeff = 2.3e-12
 df = freq_mech*1e9/Q
 rho = 3200
 overlap = 0.95

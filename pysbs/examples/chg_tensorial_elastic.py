@@ -18,13 +18,13 @@ Tis file is part of PySBS.
     author: Marcin Malinowski
 """
 
-#
-#from pysbs.el.el_mode_solver import ELSolver
-#from pysbs.el.plot import plot_displacement, plot_projection
-#from math import pi
-#from pysbs.geometry import EmbeddedWaveguide
-#from pysbs.material import IsotropicStiffness, Material
-#
+
+from pysbs.el.el_mode_solver import ELSolver
+from pysbs.el.plot import plot_displacement, plot_projection
+from math import pi
+from pysbs.geometry import EmbeddedWaveguide
+from pysbs.material import IsotropicStiffness, Material
+
 
 """
 Note that there are plenty of modes, so if you have trouble locating the 
@@ -46,13 +46,13 @@ wg = EmbeddedWaveguide(w_sim, h_sim, w_wg, h_wg, res)
 # plot domains to see how to assign materials
 # wg.plot_domains()
 materials = []
-core = Material(wg.dx(1))
+core = Material(wg.dx(2))
 # As2S3
 core.el.C = IsotropicStiffness(22.19, 6.20) # in GPa
 core.el.rho = 3.2 # g/cm3
 materials.append(core)
 # thermal oxide
-cladding = Material(wg.dx(0))
+cladding = Material(wg.dx(1))
 cladding.el.C = IsotropicStiffness(78.0, 31.6) # in GPa
 cladding.rho = 2.2 # g/cm3
 materials.append(cladding)
