@@ -30,7 +30,7 @@ class ModeSolver(object):
         self.materials = materials #FIXME throw error if not all domains are initilized
         self.eigenmode_guess = 1.0
         self.n_modes = 10 # number of modes to solve for      
-        self.plot_eigenmodes = True
+        self.plot_eigenmodes = False
         self._A = PETScMatrix()
         self._B = PETScMatrix()	
         self.esolver = SLEPcEigenSolver(self._A, self._B)

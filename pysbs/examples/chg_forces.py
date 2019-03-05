@@ -40,7 +40,7 @@ w_sim = 6.0
 h_sim = 2.0
 w_wg = 4.0
 h_wg = 0.85
-res = 50
+res = 40
 lam = 1.544
 
 n_chg = 2.37
@@ -79,20 +79,12 @@ dlam = 0.001
 em_solver = EMSolver(wg.mesh, materials, lam+dlam)
 em_solver.n_modes = 2
 em_solver.eigenmode_guess = core.em.e_r 
-em_solver.plot_eigenmodes = False
-em_solver.assemble_matrices()
-em_solver.set_electric_walls()
-em_solver.setup_solver()
 em_solver.compute_eigenvalues()
 
 (E2, n_eff2) = em_solver.extract_normalized_field(0)
 em_solver = EMSolver(wg.mesh, materials, lam)
 em_solver.n_modes = 2
 em_solver.eigenmode_guess = core.em.e_r 
-em_solver.plot_eigenmodes = False
-em_solver.assemble_matrices()
-em_solver.set_electric_walls()
-em_solver.setup_solver()
 em_solver.compute_eigenvalues()
 (E, n_eff1) = em_solver.extract_normalized_field(0)
 # calculate ng
@@ -127,15 +119,13 @@ from pysbs.gain.forces import Forces
 # Q from  "On-chip stimulated Brillouin scattering"
 Q = 7700.0/34
 # build internal boundary with its normal
-boundary = InternalBoundary(wg.domains, 1, 2)
+boundary = InternalBoundary(wg.domains, 2,1)
 forces =  Forces(E, u, q_b, Q, power_opt, power_mech, direction, freq_mech, lam, boundary, materials)
-forces.calculate_boundary_electrostriction()
 gain_bdr_electrostriction = forces.calculate_boundary_electrostriction_gain()
-forces.calculate_boundary_stress()
 gain_stress = forces.calculate_boundary_stress_gain()
-forces.calculate_bulk_electrostriction()
 gain_bulk = forces.calculate_bulk_electrostriction_gain()
 gain_total = forces.calculate_total_gain()
+
 
 print("Radiation pressure gain is %d W-1m-1" % (gain_stress))
 print("Bulk electrostriction gain is %d W-1m-1" % (gain_bulk))
@@ -152,8 +142,6 @@ rho = 3200
 overlap = 0.95
 gain_estimate = overlap*4*pi*n_chg**8*p12**2/(rho*c0*lam**3*1e-18*df*freq_mech*1e9*Aeff)
 print("Bulk electrostriction gain estimate is %d W-1m-1" % (gain_estimate))
-
-#
 
 
 

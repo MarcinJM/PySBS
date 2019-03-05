@@ -56,7 +56,11 @@ Under development:
     - Calculation of boundary forces for multilayer structures, currently only
       one boundary is handled withing the Forces class
 
-
+Next version:
+    - Update syntax to resolve "FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated"
+    - Improve plotting of elastic modes (automatic scaling of displacement for visualization), improve plotting
+      of electrostriction
+    
 
 
 License

@@ -73,10 +73,7 @@ core.el.rho = 2.328
 el_solver = ELSolver(mesh, core)
 el_solver.n_modes = 10
 el_solver.q_b = q_b
-el_solver.plot_eigenmodes = False
-el_solver.assemble_matrices()
 el_solver.eigenmode_guess =  4.26
-el_solver.setup_solver()
 el_solver.compute_eigenvalues()
 (u, freq_mech) = el_solver.extract_field(0)
 plot_projection(mesh, u, 'X')

@@ -125,6 +125,8 @@ class Forces():
                                                        offset = 1e-12)
         
     def calculate_boundary_electrostriction_gain(self):
+        if self.f_bdr_elcst is None:
+            self.calculate_boundary_electrostriction()
         self.gain_bdr_elcst =  boundary_force_gain(self.Q,
                                                    self.power_opt, 
                                                    self.power_mech, 
@@ -146,6 +148,8 @@ class Forces():
                                   offset = 1e-12)
     
     def calculate_boundary_stress_gain(self):
+        if self.f_bdr_stress is None:
+            self.calculate_boundary_stress()
         self.gain_bdr_stress =  boundary_force_gain(self.Q,
                                                     self.power_opt,
                                                     self.power_mech,
@@ -175,6 +179,8 @@ class Forces():
                 self.f_bulk_elcst.append((fr_bulk, fi_bulk))
     
     def calculate_bulk_electrostriction_gain(self):
+        if self.f_bulk_elcst is None:
+            self.calculate_bulk_electrostriction()
         if self._Esub is not None:            
             self.gain_bulk_elcst = bulk_force_gain(self.Q, 
                                                   self.power_opt, 
@@ -199,6 +205,14 @@ class Forces():
 
     
     def calculate_total_gain(self):
+        
+        if self.f_bdr_elcst is None:
+            self.calculate_boundary_electrostriction()
+        if self.f_bdr_stress is None:
+            self.calculate_boundary_stress()
+        if self.f_bulk_elcst is None:
+            self.calculate_bulk_electrostriction()
+        
         
         coupling_bdr_elcst = boundary_force_coupling(self.f_bdr_elcst[0], 
                                                          self.f_bdr_elcst[0], 

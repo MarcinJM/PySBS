@@ -74,7 +74,7 @@ class RidgeWaveguide():
     """ a ridge waveguide with cladding class 
         builds the mesh and marks domains """
     
-    def __init__(self, w_membrane, w_ridge, h_ridge, h_memebrane, w_sim, h_sim, res):
+    def __init__(self, w_membrane, w_ridge, h_ridge, h_membrane, w_sim, h_sim, res):
         self.res = res
         domain_vertices = [Point(w_membrane/2, 0.0),
                            Point(w_membrane/2, h_membrane),

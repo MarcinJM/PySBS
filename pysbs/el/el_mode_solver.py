@@ -136,6 +136,8 @@ class ELSolver(ModeSolver):
 
 
     def compute_eigenvalues(self):
+        self.assemble_matrices()
+        self.setup_solver()
         self.esolver.solve(self.n_modes)
         if self.esolver.get_number_converged()==0:
             print( 'Eigensolver did not calculate eigenmodes. Increase log level')

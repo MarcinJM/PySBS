@@ -21,7 +21,7 @@ from dolfin import plot, split, dot, project, facets, as_vector
 from dolfin.cpp.mesh import MeshFunctionBool
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
-
+from matplotlib import cm
 
 
 class MyDict(dict):
@@ -36,8 +36,27 @@ def mesh2triang(mesh):
 def plot_transverse_field(f):
     transverseE = as_vector([f[0], f[1]])
     normE = dot(transverseE, transverseE)
-    plt.figure()
-    plot(normE, backend = "matplotlib")
+    
+    normEE = project(normE)
+    mesh = normEE.function_space().mesh()
+    w0 = normEE.compute_vertex_values(mesh)
+    
+    
+    XY = mesh.coordinates()
+    X = XY[:,0]
+    Y = XY[:,1]
+    #Z = np.zeros(nv)  
+    
+    mesh_plot = tri.Triangulation(X, Y, mesh.cells())
+    fig = plt.figure(figsize=(8,6))   
+    plt.tripcolor(mesh_plot, w0, cmap = cm.plasma)
+    plt.xlabel('x [$\mu$m]', fontsize=24)
+    plt.ylabel('y [$\mu$m]', fontsize=24)    
+    cbar = plt.colorbar()
+    cbar.ax.tick_params(labelsize=22) 
+    plt.tight_layout()
+    plt.tick_params(labelsize=22)
+    plt.axis('equal') 
     plt.show()
 
 def plot_vector_in_xy_plane(f):
