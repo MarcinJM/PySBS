@@ -50,7 +50,7 @@ def MaxwellsStressTensor(E, e_r, direction):
              [E[1]*E[0], E[1]*E[1] - norm, 0.0],
              [0.0, 0.0,   E[2]*E[2] - norm]]))
 
-        t_i = 0.5*(e_r*epsilon_0*np.array(
+        t_i = (e_r*epsilon_0*np.array(
             [[0.0, 0.0, 0.0],
              [0.0, 0.0, 0.0],
              [0.0, 0.0, 0.0]]))
@@ -63,7 +63,7 @@ def MaxwellsStressTensor(E, e_r, direction):
              [E[1]*E[0], E[1]*E[1] - norm, 0.0],
              [0.0, 0.0, E[2]*E[2] - norm]]))
 
-        t_i = 0.5*(e_r*epsilon_0*np.array(
+        t_i = (e_r*epsilon_0*np.array(
             [[0.0, 0.0, E[0]*E[2]],
              [0.0, 0.0, E[1]*E[2]],
              [E[2]*E[0], E[2]*E[1], 0.0]]))

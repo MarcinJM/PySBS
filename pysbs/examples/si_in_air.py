@@ -41,12 +41,12 @@ h_sim = 1.5
 w_wg = 0.45
 h_wg = 0.23
 lam = 1.55
-res = 50
+res = 100
 n_si = 3.48
 n_air = 1.0
 
-direction = 'forward'
-#direction = 'backward'
+#direction = 'forward'
+direction = 'backward'
 
 """ geometery """
 wg = EmbeddedWaveguide(w_sim, h_sim, w_wg, h_wg, res)
@@ -93,7 +93,7 @@ print("Group refractive index is %f " % (ng))
 power_opt = em_solver.calculate_power(0, ng)
 plot_transverse_field(E)
 
-    """find the fundamental elastic mode """
+"""find the fundamental elastic mode """
 
 
 if direction == 'forward':
